@@ -9,6 +9,7 @@ public class OptionButton : MonoBehaviour, IPointerDownHandler {
 		if (callback != null) {
             callback();
         }
+        GameObject.Find("GameController").GetComponent<GameController>().PlayClickSound();
 	}
 
 }

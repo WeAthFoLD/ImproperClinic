@@ -55,12 +55,22 @@ public class GameController : MonoBehaviour {
 
     List<Record> records = new List<Record>();
 
+    public AudioClip
+        soundHeal, soundDie, soundDoorOpen, soundDoorClose, soundClick, soundClear;
+
+    AudioSource audioSource;
+
     Patient NextPatient() {
         return WeightedAverage.RandItem<PatientItem, Patient>(patients);
     }
 
     void Start() {
+        audioSource = GetComponent<AudioSource>();
         Restart();
+    }
+
+    void PlaySound(AudioClip c) {
+        audioSource.PlayOneShot(c);
     }
 
     public void Restart() {
@@ -89,6 +99,8 @@ public class GameController : MonoBehaviour {
             patientsLeft = 3;
             ++dayCount;
         }
+
+        PlaySound(soundDoorOpen);
 
         ShowPatientText(patient.diagnosticMessage);
 
@@ -158,6 +170,7 @@ public class GameController : MonoBehaviour {
 
     IEnumerator DoApplyEffect(Consequence cons, HealOption option, string ending) {
         characterImage.GetComponent<Animator>().Play("BlendOut");
+        PlaySound(soundDoorClose);
 
         // hack: hide the options
         var lst = new List<Option>();
@@ -174,8 +187,10 @@ public class GameController : MonoBehaviour {
         patientsLeft -= 1;
         if (player.health == 0) {
             StartDeath();
+            PlaySound(soundDie);
         } else if (patientsLeft == 0) {
             StartClearing();
+            PlaySound(soundClear);
         } else {
             StartDiagnosing();
         }
@@ -211,6 +226,11 @@ public class GameController : MonoBehaviour {
         optionList.SetActive(false);
 
         patientText.text = text;
+    }
+
+    public void PlayClickSound() {
+        print("PlayClickSound");
+        PlaySound(soundClick);
     }
 
     void ShowOptionList(List<Option> options) {
